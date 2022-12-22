@@ -8,7 +8,7 @@ from rest_framework.generics import get_object_or_404
 from django.db.models import Q
 
 from EshartApp.models import terminal,ticket,travel,supporter,admin1,company,passenger
-from EshartApp.api.serializers import travelGet_serializer,travelPost_serializer,passengerConfirmation_serializer,ticketRegistration_serializer,travelCreate_serializer,supporter_serializer
+from EshartApp.api.serializers import travelGet_serializer,travelPost_serializer,passengerConfirmation_serializer,ticketRegistration_serializer,travelCreate_serializer,supporter_serializer,adminLogin_serilizer,adminRespond_serializer
 
 class travelRespond_api(APIView):
     def get(self,request): #همه سفر ها را میگیرد
@@ -62,11 +62,14 @@ class passengerConfirmation_api(APIView):
         return Response(serilizer.data,status=status.HTTP_200_OK)
     
     def put(self,request):# نام نام خوانوادگی کد ملی جنسیت و تاریخ تولد را میگیرد و مسافر را می سازد
-        
+        latest_id = passenger.objects.latest('id').id
+        s=int(latest_id)
         serilizer=passengerConfirmation_serializer(data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            s=s+1
+            
+            return Response(s,status=status.HTTP_201_CREATED)
        
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -91,3 +94,24 @@ class  supporter_api(APIView):
         serializer=supporter_serializer(Supporter,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
+class adminLogin_api(APIView):
+    def get(self,rerquest):
+        Admin=admin1.objects.all()
+        serilizer=adminRespond_serializer(Admin,many=True)
+        return Response(serilizer.data,status=status.HTTP_200_OK)
+
+    def put(self,request):
+        serilizer=adminLogin_serilizer(data=request.data)
+        if serilizer.is_valid():
+            pd=serilizer.data["userAdmin"]
+            pf=serilizer.data["passAdmin"]
+            f=admin1.objects.filter(Q(userAdmin=pd)&Q(passAdmin=pf))
+            #serilizer1=adminRespond_serializer(data=f)
+            #Admin=admin1.objects.all()
+            serilizer1=adminRespond_serializer(data=f,many=True)
+            if serilizer1.is_valid():
+                return Response(serilizer1.data,status=status.HTTP_200_OK)
+
+            return Response(data=serilizer1.data,status=status.HTTP_404_NOT_FOUND)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)

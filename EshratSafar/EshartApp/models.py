@@ -37,10 +37,10 @@ class supporter(models.Model):
     telegram=models.URLField(max_length=200,null=True)
 
 class admin1(models.Model):
-    username=models.CharField(max_length=15)
-    password=models.CharField(max_length=15)
-    name=models.CharField(max_length=30)
-    site=models.CharField(max_length=30)
+    userAdmin=models.CharField(max_length=15,null=True)
+    passAdmin=models.CharField(max_length=15,null=True)
+    name=models.CharField(max_length=30,null=True)
+    site=models.CharField(max_length=30,null=True)
     
 
 class terminal(models.Model):
